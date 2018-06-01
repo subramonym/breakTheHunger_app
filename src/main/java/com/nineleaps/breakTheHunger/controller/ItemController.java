@@ -24,32 +24,6 @@ public class ItemController {
     @Autowired
     ItemService itemService;
 
-    @RequestMapping(value = "/item/add",method = RequestMethod.POST)
-    @ApiOperation(value = "Register the item", nickname = "Register ItemController")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success", response = UserRequestDto.class),
-            @ApiResponse(code = 400, message = "Bad Request"), @ApiResponse(code = 404, message = "Not Found"),
-            @ApiResponse(code = 500, message = "Internal Server Error")})
-    @ResponseBody
-    public ResponseEntity addItem (@RequestBody ItemRequestDto itemRequestDto) {
-
-        ResponseEntity responseEntity = null;
-
-        if(itemRequestDto.getItemName() == null || itemRequestDto.getType() == null
-                || itemRequestDto.getDescription() == null || itemRequestDto.getPrice() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Attributes are mandatory cannot be Null");
-        }
-
-        Boolean isSuccess = itemService.saveItemDetails(itemRequestDto);
-
-        if(isSuccess) {
-            return ResponseEntity.status(HttpStatus.OK).body("{\"message\":" + "\""
-                    + "item has been Successfully Registered" + "\"}");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
-        }
-    }
-
     @RequestMapping(value = "/item/getall",method = RequestMethod.GET)
     @ApiOperation(value = "Get all the item", nickname = "getAll ItemController")
     @ResponseBody
@@ -60,10 +34,9 @@ public class ItemController {
     @RequestMapping(value = "/item/getall/{userid}",method = RequestMethod.GET)
     @ApiOperation(value = "Get all the item based on userid", nickname = "getAll with userid ItemController")
     @ResponseBody
-    public List<ItemEntity> getItemByUserId (@PathVariable String userId) {
+    public List<ItemEntity> getItemByUserId (@RequestParam String userId) {
         return itemService.getAllItemsByUserId(userId);
     }
-
 
     @RequestMapping(value = "/item/get/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "Get all the item", nickname = "getOne item ItemController")
@@ -71,7 +44,5 @@ public class ItemController {
     public ItemEntity getOneItem(@PathVariable String id) {
         return itemService.getItem(id);
     }
-
-
 
 }

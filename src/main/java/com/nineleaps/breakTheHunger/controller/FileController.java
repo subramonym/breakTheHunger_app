@@ -1,61 +1,101 @@
 package com.nineleaps.breakTheHunger.controller;
 
-import com.nineleaps.breakTheHunger.commonConfig.UploadFileResponse;
+import com.nineleaps.breakTheHunger.dto.ItemRequestDto;
+import com.nineleaps.breakTheHunger.elasticsearch.ElasticSearchOperation;
+import com.nineleaps.breakTheHunger.entities.ImageEntity;
+import com.nineleaps.breakTheHunger.entities.ItemEntity;
+import com.nineleaps.breakTheHunger.repositories.ImageRepository;
 import com.nineleaps.breakTheHunger.service.FileStorageService;
+import com.nineleaps.breakTheHunger.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import org.springframework.core.io.Resource;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Date;
 
 @RestController
+@RequestMapping("breakTheHunger")
 public class FileController {
 
     @Autowired
     private FileStorageService fileStorageService;
 
-    @PostMapping("/uploadFile")
-    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
+    @Autowired
+    ItemService itemService;
+
+    @Autowired
+    ImageRepository imageRepository;
+
+    @Autowired
+    ElasticSearchOperation elasticSearchOperation;
+
+    @RequestMapping( value = "/supplierRegistration", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public ResponseEntity uploadFile(@RequestParam("itemId") String itemId,
+                                     @RequestParam("userId") String userId,
+                                     @RequestParam("itemName") String itemName,
+                                     @RequestParam("type") String type,
+                                     @RequestParam("description") String description,
+                                     @RequestParam("price") int price,
+                                     @RequestParam("time") @DateTimeFormat(pattern="MMddyyyy") Date time,
+                                     @RequestParam("file") MultipartFile file) {
+
+        if(itemId == null || userId == null
+                || itemName == null || type == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Attributes are mandatory cannot be Null");
+        }
+
+        ItemRequestDto itemRequestDto = new ItemRequestDto();
+
+        itemRequestDto.setUserId(userId);
+        itemRequestDto.setItemName(itemName);
+        itemRequestDto.setType(type);
+        itemRequestDto.setDescription(description);
+        itemRequestDto.setPrice(price);
+        itemRequestDto.setTime(time);
+
+        ItemEntity itemEntity = itemService.saveItemDetails(itemRequestDto);
         String fileName = fileStorageService.storeFile(file);
+        ImageEntity imageEntity = new ImageEntity();
+        imageEntity.setImageId(itemEntity.getItemId()+":"+fileName);
+        imageEntity.setItemId(itemEntity.getItemId());
+        imageEntity.setFileName(fileName);
+
+        imageRepository.save(imageEntity);
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/downloadFile/")
+                .path("/downloadFile")
                 .path(fileName)
                 .toUriString();
+        return ResponseEntity.status(HttpStatus.OK).body("{\"message\":" + "\""
+                + "Item details has been Successfully Registered" + "\"}");
 
-        return new UploadFileResponse(fileName, fileDownloadUri,
-                file.getContentType(), file.getSize());
+//        return new UploadFileResponse(fileName, fileDownloadUri,
+//                file.getContentType(), file.getSize());
     }
 
-    @PostMapping("/uploadMultipleFiles")
-    public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
-        return Arrays.asList(files)
-                .stream()
-                .map(file -> uploadFile(file))
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("/downloadFile/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
+    @GetMapping("/downloadFile")
+    public ResponseEntity<Resource> downloadFile(@RequestParam String itemId, HttpServletRequest request) {
         // Load file as Resource
-        Resource resource = fileStorageService.loadFileAsResource(fileName);
+
+        ImageEntity imageEntity = elasticSearchOperation.fetchElasticImageEntity(itemId);
+
+        Resource resource = fileStorageService.loadFileAsResource(imageEntity.getFileName());
 
         // Try to determine file's content type
         String contentType = null;
         try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
-
+            System.out.println("Error fetching the image");
         }
 
         // Fallback to the default content type if type could not be determined
