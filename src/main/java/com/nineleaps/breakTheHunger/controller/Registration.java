@@ -19,6 +19,7 @@ public class Registration {
         User user = new User();
         user.setId("1");
         user.setName("subbu");
+        user.setPassword("abcd");
         userRepository.save(user);
         System.out.println("its working");
     }
