@@ -1,37 +1,22 @@
 package com.nineleaps.breakTheHunger.entities;
 
-import org.apache.lucene.geo3d.GeoPoint;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.GeoPointField;
 
-@Document(indexName = "user_details",type = "user")
-public class User {
+@Document(indexName = "user_details", type = "user")
+public class UserEntity {
 
     @Id
-
     private String id;
     private String name;
     private String address;
     private String mobileNo;
     private String email;
     private String password;
-    private GeoPoint geoLocation;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    @GeoPointField
+    private String geoLocation;
 
     public String getAddress() {
         return address;
@@ -65,11 +50,27 @@ public class User {
         this.password = password;
     }
 
-    public GeoPoint getGeoLocation() {
+    public String getGeoLocation() {
         return geoLocation;
     }
 
-    public void setGeoLocation(GeoPoint geoLocation) {
+    public void setGeoLocation(String geoLocation) {
         this.geoLocation = geoLocation;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

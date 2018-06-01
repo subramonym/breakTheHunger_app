@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LoginRequestDto {
     @JsonProperty
-    String username;
+    String mobileNo;
     @JsonProperty
     String password;
 
-    public String getUsername() {
-        return username;
+    public String getMobileNo() {
+        return mobileNo;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setMobileNo(String mobileNo) {
+        this.mobileNo = mobileNo;
     }
 
     public String getPassword() {
