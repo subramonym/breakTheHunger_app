@@ -5,8 +5,6 @@ import com.nineleaps.breakTheHunger.entities.UserEntity;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface UserRepository extends ElasticsearchRepository<UserEntity,String> {
 
