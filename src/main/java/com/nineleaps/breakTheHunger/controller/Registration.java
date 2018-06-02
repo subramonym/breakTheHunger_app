@@ -31,9 +31,12 @@ public class Registration {
     @ResponseBody
     public ResponseEntity check (@RequestBody UserRequestDto userRequestDto) {
 
+        ResponseEntity responseEntity = null;
+
         if(userRequestDto.getName() == null || userRequestDto.getAddress() == null || userRequestDto.getEmail() == null
-                || userRequestDto.getLattitude() == null || userRequestDto.getMobileNo() == null
-                || userRequestDto.getPassword() == null || userRequestDto.getLongitude() == null) {
+                || userRequestDto.getLattitude() == null
+                || userRequestDto.getMobileNo() == null || userRequestDto.getPassword() == null
+                || userRequestDto.getLongitude() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Attributes are mandatory cannot be Null");
         }
 

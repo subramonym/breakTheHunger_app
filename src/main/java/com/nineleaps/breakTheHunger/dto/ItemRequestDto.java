@@ -16,8 +16,6 @@ public class ItemRequestDto {
     private String description;
     @JsonProperty("price")
     private Integer price;
-    @JsonProperty("time")
-    private Date time;
 
     public String getUserId() {
         return userId;
@@ -57,13 +55,5 @@ public class ItemRequestDto {
 
     public void setPrice(Integer price) {
         this.price = price;
-    }
-
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
     }
 }

@@ -39,16 +39,14 @@ public class FileController {
 
     @RequestMapping( value = "/supplierRegistration", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ResponseEntity uploadFile(@RequestParam("itemId") String itemId,
-                                     @RequestParam("userId") String userId,
+    public ResponseEntity uploadFile(@RequestParam("userId") String userId,
                                      @RequestParam("itemName") String itemName,
                                      @RequestParam("type") String type,
                                      @RequestParam("description") String description,
                                      @RequestParam("price") int price,
-                                     @RequestParam("time") @DateTimeFormat(pattern="MMddyyyy") Date time,
                                      @RequestParam("file") MultipartFile file) {
 
-        if(itemId == null || userId == null
+        if(description == null || userId == null
                 || itemName == null || type == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Attributes are mandatory cannot be Null");
         }
@@ -60,8 +58,6 @@ public class FileController {
         itemRequestDto.setType(type);
         itemRequestDto.setDescription(description);
         itemRequestDto.setPrice(price);
-        itemRequestDto.setTime(time);
-
         ItemEntity itemEntity = itemService.saveItemDetails(itemRequestDto);
         String fileName = fileStorageService.storeFile(file);
         ImageEntity imageEntity = new ImageEntity();

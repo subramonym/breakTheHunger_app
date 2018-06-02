@@ -26,7 +26,7 @@ public class UserService {
 
     private UserEntity formUserEntity(UserRequestDto userRequestDto) {
         UserEntity userEntity = new UserEntity();
-        String id = userRequestDto.getEmail() + ":" + userRequestDto.getMobileNo();
+        String id = userRequestDto.getName() + ":" + userRequestDto.getMobileNo();
         userEntity.setId(id);
         userEntity.setAddress(userRequestDto.getAddress());
         userEntity.setEmail(userRequestDto.getEmail());

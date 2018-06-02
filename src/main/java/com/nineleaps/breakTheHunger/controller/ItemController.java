@@ -1,6 +1,7 @@
 package com.nineleaps.breakTheHunger.controller;
 
 import com.nineleaps.breakTheHunger.dto.ItemRequestDto;
+import com.nineleaps.breakTheHunger.dto.ItemUserResponseDto;
 import com.nineleaps.breakTheHunger.dto.UserRequestDto;
 import com.nineleaps.breakTheHunger.entities.ItemEntity;
 import com.nineleaps.breakTheHunger.repositories.ItemRepository;
@@ -25,7 +26,7 @@ public class ItemController {
     ItemService itemService;
 
     @RequestMapping(value = "/item/getall",method = RequestMethod.GET)
-    @ApiOperation(value = "Get all the item", nickname = "getAll ItemController")
+    @ApiOperation(value = "Get all the item", nickname = "getAll Item")
     @ResponseBody
     public List<ItemEntity> getAllItems () {
         return itemService.getAllItems();
@@ -38,11 +39,18 @@ public class ItemController {
         return itemService.getAllItemsByUserId(userId);
     }
 
-    @RequestMapping(value = "/item/get/{id}",method = RequestMethod.GET)
-    @ApiOperation(value = "Get all the item", nickname = "getOne item ItemController")
+    @RequestMapping(value = "/item/seller/get/{id}",method = RequestMethod.GET)
+    @ApiOperation(value = "Get one item", nickname = "getOne item")
     @ResponseBody
     public ItemEntity getOneItem(@PathVariable String id) {
         return itemService.getItem(id);
+    }
+
+    @RequestMapping(value = "/item/buyer/get/{id}",method = RequestMethod.GET)
+    @ApiOperation(value = "Get one item and user", nickname = "getOne item and user")
+    @ResponseBody
+    public ItemUserResponseDto getOneItemWithUserDetail(@PathVariable String id) {
+        return itemService.getOneItemWithUserDetail(id);
     }
 
 }
